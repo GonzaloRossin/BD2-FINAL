@@ -20,7 +20,7 @@ app.get('/users/:user_id', (req, res) => {
 
     res.status(200).send({
         response: `this should return the user of id=${user_id}`
-    })
+    });
 })
 
 app.post('/users', (req, res) => {
@@ -30,16 +30,16 @@ app.post('/users', (req, res) => {
     const { email } = req.body;
 
     if(!username && !password && !email){
-        res.status(418).send({message: 'request body is empty'})
+        res.status(418).send({message: 'request body is empty'});
     }
     if(!username){
-        res.status(418).send({message: 'username is empty'})
+        res.status(418).send({message: 'username is empty'});
     }
     if(!password){
-        res.status(418).send({message: 'password is empty'})
+        res.status(418).send({message: 'password is empty'});
     }
     if(!email){
-        res.status(418).send({message: 'email is empty'})
+        res.status(418).send({message: 'email is empty'});
     }
 
     res.status(200).send({
@@ -47,15 +47,21 @@ app.post('/users', (req, res) => {
         username: `${username}`,
         password: `${password}`,
         email: `${email}`
-    })
+    });
 })
 
 app.put('/users', (req,res) => {
-    res.status(200).send({message: 'a user should be modified'})
+    res.status(200).send({message: 'a user should be modified'});
 })
 
-app.delete('/users', (req, res) => {
-    res.status(200).send({message: 'a user should be deleted'})
+app.delete('/users/:user_id', (req, res) => {
+    const { user_id } = req.params;
+
+    if(!user_id){
+        res.status(418).send({message:'user_id is not present'});
+    }
+
+    res.status(200).send({message: 'a user should be deleted'});
 })
 
 
@@ -66,7 +72,7 @@ app.post('/tshirt/:id', (req,res) => {
     const { logo } = req.body;
 
     if(!logo){
-        res.status(418).send({message: 'We need a logo!'})
+        res.status(418).send({message: 'We need a logo!'});
     }
 
     res.status(200).send({
