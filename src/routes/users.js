@@ -36,6 +36,7 @@ router.post('/', (req, res) => {
         res.status(418).send({message: 'email is empty'});
     }
 
+
     res.status(200).send({
         message: 'user was created'
     })
@@ -54,21 +55,5 @@ router.delete('/:user_id', (req, res) => {
 
     res.status(200).send({message: 'a user should be deleted'});
 })
-
-
-
-/*router.post('/tshirt/:id', (req,res) => {
-
-    const { id } = req.params; //si la info esta en el el body de la request usar req.body
-    const { logo } = req.body;
-
-    if(!logo){
-        res.status(418).send({message: 'We need a logo!'});
-    }
-
-    res.status(200).send({
-        tshirt: `shirt with your logo = ${logo} and id = ${id}`
-    });
-})*/
 
 module.exports = router;
