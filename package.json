@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/GonzaloRossin/BD2-FINAL#readme",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "mongodb": "^4.12.1"
   },
