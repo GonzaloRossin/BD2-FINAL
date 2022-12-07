@@ -1,20 +1,14 @@
 const express = require('express');
-const app = express();
-const PORT = 7070
 
-app.listen(PORT,
-    () => console.log(`it's alive on http://localhost:${PORT}`)
-)
+const router = express.Router();
 
-app.use(express.json())//middleware para que parsee la request como json antes de la response
-
-app.get('/users', (req, res) => {
+router.get('/', (req, res) => {
     res.status(200).send({
         response: 'this should return all users'
     })
 });
 
-app.get('/users/:user_id', (req, res) => {
+router.get('/:user_id', (req, res) => {
     
     const { user_id } = req.params;
 
@@ -23,7 +17,7 @@ app.get('/users/:user_id', (req, res) => {
     });
 })
 
-app.post('/users', (req, res) => {
+router.post('/', (req, res) => {
     
     const { username } = req.body;
     const { password } = req.body;
@@ -43,18 +37,15 @@ app.post('/users', (req, res) => {
     }
 
     res.status(200).send({
-        message: `a user with user was created`,
-        username: `${username}`,
-        password: `${password}`,
-        email: `${email}`
-    });
+        message: 'user was created'
+    })
 })
 
-app.put('/users', (req,res) => {
+router.put('/', (req,res) => {
     res.status(200).send({message: 'a user should be modified'});
 })
 
-app.delete('/users/:user_id', (req, res) => {
+router.delete('/:user_id', (req, res) => {
     const { user_id } = req.params;
 
     if(!user_id){
@@ -66,7 +57,7 @@ app.delete('/users/:user_id', (req, res) => {
 
 
 
-app.post('/tshirt/:id', (req,res) => {
+/*router.post('/tshirt/:id', (req,res) => {
 
     const { id } = req.params; //si la info esta en el el body de la request usar req.body
     const { logo } = req.body;
@@ -78,4 +69,6 @@ app.post('/tshirt/:id', (req,res) => {
     res.status(200).send({
         tshirt: `shirt with your logo = ${logo} and id = ${id}`
     });
-})
+})*/
+
+module.exports = router;
