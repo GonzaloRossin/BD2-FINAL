@@ -1,8 +1,9 @@
 const {MongoClient} = require('mongodb');
+require('dotenv').config();
 
 const url = `mongodb://localhost:27017/BD2Final`;
 
-const client = new MongoClient(url);
+const client = new MongoClient(process.env.DB_URL);
 
 const init = async () => {
     try{
@@ -14,7 +15,7 @@ const init = async () => {
 };
 
 const getDb = () => {
-    return client.db('BD2Final');
+    return client.db(process.env.DB_NAME);
 };
 
 module.exports.init = init;
