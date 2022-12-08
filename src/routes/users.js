@@ -1,5 +1,5 @@
 const express = require('express');
-
+const joi = require('joi');
 const router = express.Router();
 const mongo = require('../db/db.util');
 
@@ -32,37 +32,34 @@ router.get('/:user_id', (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    const client = req.client;
-    const { username } = req.body;
-    const { password } = req.body;
-    const { email } = req.body;
 
-    if(!username && !password && !email){
-        res.status(418).send({message: 'request body is empty'});
-    }
-    if(!username){
-        res.status(418).send({message: 'username is empty'});
-    }
-    if(!password){
-        res.status(418).send({message: 'password is empty'});
-    }
-    if(!email){
-        res.status(418).send({message: 'email is empty'});
-    }
+    const userSchema = joi.object().keys({
+        username: joi.string().alphanum().min(4).max(12).required(),
+        password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).min(3).max(20).required(),
+        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required()
+    });
 
-    try{
-        const data = await mongo.getDb().collection('dummy').insertOne({
-            username: req.body.username,
-            password: req.body.password,
-            email: req.body.email
-        });
+    const {error} = userSchema.validate(req.body);
+    const valid = error == null;
 
-        if(data){
-            res.status(200).send({message: 'user was created'});
+    if(!valid){
+        res.status(422).json({error: error.message});
+    }else{
+        
+        try{
+            const data = await mongo.getDb().collection('dummy').insertOne({
+                username: req.body.username,
+                password: req.body.password,
+                email: req.body.email
+            });
+    
+            if(data){
+                res.status(200).send({message: 'user was created'});
+            }
+    
+        }catch(error){
+            res.status(500).json({message: 'Error creating user', error});
         }
-
-    }catch(error){
-        res.status(500).json({message: 'Error creating user', error});
     }
 
 })
