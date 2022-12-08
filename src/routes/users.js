@@ -23,7 +23,9 @@ router.get('/', (req, res) => {
 router.get('/:user_id', (req, res) => {
     
     try {
-        db.collection(process.env.COLLECTION_USERS).findOne({_id: ObjectId(req.params.user_id)}).then((doc) => {
+        db.collection(process.env.COLLECTION_USERS)
+        .findOne({_id: ObjectId(req.params.user_id)})
+        .then((doc) => {
             res.status(200).json(doc);
         });
 
@@ -31,7 +33,7 @@ router.get('/:user_id', (req, res) => {
     }catch(error){
         res.status(500).json({message: 'Error getting user', error}); 
     }
-})
+});
 
 router.post('/', async (req, res) => {
 
@@ -92,7 +94,7 @@ router.put('/:user_id', (req,res) => {
             res.status(500).json({message: 'Error deleting user', error}); 
         }
     }
-})
+});
 
 router.delete('/:user_id', (req, res) => {
 
@@ -105,6 +107,6 @@ router.delete('/:user_id', (req, res) => {
     }catch(error){
         res.status(500).json({message: 'Error deleting user', error}); 
     }
-})
+});
 
 module.exports = router;
