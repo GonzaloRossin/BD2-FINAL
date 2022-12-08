@@ -3,13 +3,13 @@ const express = require('express');
 const joi = require('joi');
 const { ObjectId } = require('mongodb');
 const router = express.Router();
-const mongo = require('../db/db.util');
+const db = require('../db/db.util').getDb();
 
 
 router.get('/', (req, res) => {
 
     try {
-        mongo.getDb().collection(process.env.COLLECTION_USERS).find({}).toArray().then((docs) => {
+        db.collection(process.env.COLLECTION_USERS).find({}).toArray().then((docs) => {
             res.status(200).json(docs)
         });
 
@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
 router.get('/:user_id', (req, res) => {
     
     try {
-        mongo.getDb().collection(process.env.COLLECTION_USERS).findOne({_id: ObjectId(req.params.user_id)}).then((doc) => {
+        db.collection(process.env.COLLECTION_USERS).findOne({_id: ObjectId(req.params.user_id)}).then((doc) => {
             res.status(200).json(doc);
         });
 
@@ -49,7 +49,7 @@ router.post('/', async (req, res) => {
     }else{
         
         try{
-            const data = await mongo.getDb().collection(process.env.COLLECTION_USERS).insertOne({
+            const data = await db.collection(process.env.COLLECTION_USERS).insertOne({
                 username: req.body.username,
                 password: req.body.password,
                 email: req.body.email,
@@ -69,16 +69,25 @@ router.post('/', async (req, res) => {
 })
 
 router.put('/:user_id', (req,res) => {
-    if(req.body._id){
-        res.status(500).send({message: 'user id cannot be changed'})
+
+    const userEditSchema = joi.object().keys({
+        username: joi.string().alphanum().min(4).max(12),
+        password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).min(3).max(20),
+        email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+    });
+    const {error} = userEditSchema.validate(req.body);
+    const valid = error == null;
+
+    if(!valid){
+        res.status(422).json({error: error.message});
     }else{
         const updateQuery = {$set: req.body};
         try {
-            mongo.getDb().collection(process.env.COLLECTION_USERS)
-            .updateOne({_id: ObjectId(req.params.user_id)}, updateQuery)
-            .then(() => {
-                res.status(200).send({message: 'user updated succesfully'});
-            });
+            db.collection(process.env.COLLECTION_USERS)
+                .updateOne({_id: ObjectId(req.params.user_id)}, updateQuery)
+                .then(() => {
+                    res.status(200).send({message: 'user updated succesfully'});
+                });
         }catch(error){
             res.status(500).json({message: 'Error deleting user', error}); 
         }
@@ -88,7 +97,7 @@ router.put('/:user_id', (req,res) => {
 router.delete('/:user_id', (req, res) => {
 
     try {
-        mongo.getDb().collection(process.env.COLLECTION_USERS).deleteOne({_id: ObjectId(req.params.user_id)}).then(() => {
+        db.collection(process.env.COLLECTION_USERS).deleteOne({_id: ObjectId(req.params.user_id)}).then(() => {
             res.status(200).send({message: 'user deleted succesfully'});
         });
 
