@@ -69,7 +69,20 @@ router.post('/', async (req, res) => {
 })
 
 router.put('/:user_id', (req,res) => {
-    res.status(200).send({message: 'a user should be modified'});
+    if(req.body._id){
+        res.status(500).send({message: 'user id cannot be changed'})
+    }else{
+        const updateQuery = {$set: req.body};
+        try {
+            mongo.getDb().collection(process.env.COLLECTION_USERS)
+            .updateOne({_id: ObjectId(req.params.user_id)}, updateQuery)
+            .then(() => {
+                res.status(200).send({message: 'user updated succesfully'});
+            });
+        }catch(error){
+            res.status(500).json({message: 'Error deleting user', error}); 
+        }
+    }
 })
 
 router.delete('/:user_id', (req, res) => {
