@@ -74,8 +74,43 @@ router.post('/:user_id', async (req, res) => {
     
 });
 
-router.post('/:document_id/blocks', (req, res) => {
+router.post('/:document_id/blocks', async (req, res) => {
+    const blockSchema = joi.object().keys({
+        contentType: joi.string().valid('header1', 'header2', 'text', 'page', 'link', 'image').required(),
+        content: joi.string().min(1).max(500).required(),
+        status: joi.string().valid('done', 'toDo', 'none').required()
+    });
+
+    const {error} = blockSchema.validate(req.body);
+    const valid = error == null;
+
+    if(!valid){
+        res.status(422).json({error: error.message});
+    }else{
+        try{
+            const documentData = await db.collection(process.env.COLLECTION_DOCUMENTS)
+                .updateOne({_id: ObjectId(req.params.document_id)}, 
+                {
+                    $push:{blocks:
+                        {
+                            contentType: req.body.contentType,
+                            content: req.body.content,
+                            status: req.body.status
+                        }
+                    },
+                    $set: {lastEditedAt: new Date()}
+                }
+            );
+
     
+            if(documentData){
+                res.status(200).send({message: 'block was added to document'});
+            }
+    
+        }catch(error){
+            res.status(500).json({message: 'Error creating block', error});
+        }
+    }
     
 });
 
@@ -84,9 +119,15 @@ router.put('/:document_id/blocks/:block_id', (req, res) => {
     
 });
 
-router.delete('/:document_id/blocks/:block_id', (req, res) => {
+router.delete('/:document_id/blocks/:block_id', async (req, res) => {
+    const data = await db.collection(process.env.COLLECTION_DOCUMENTS)
+                        .updateOne({_id: ObjectId(req.params.document_id)}, {$pull: { blocks: req.params.block_id}});
     
-    
+    if(data){
+        res.status(200).send({message: 'block removed from document'});
+    }else{
+        res.status(500).send({message: 'error while removing block from document'});
+    }
 });
 
 module.exports = router;

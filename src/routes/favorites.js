@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const joi = require('joi');
 const { ObjectId } = require('mongodb');
 const router = express.Router();
 const db = require('../db/db.util').getDb();
@@ -31,7 +30,7 @@ router.delete('/:user_id/:document_id', async (req, res) => {
     if(data){
         res.status(200).send({message: 'document removed from favorites'});
     }else{
-        res.status(500).send({message: 'error while removing document to favorites'});
+        res.status(500).send({message: 'error while removing document from favorites'});
     }
 });
 
