@@ -31,8 +31,9 @@ router.delete('/:document_id', (req, res) => {
     
 });
 
-router.post('/:user_id', async (req, res) => {
+router.post('/', async (req, res) => {
     const documentSchema = joi.object().keys({
+        user_id: joi.string().alphanum().length(24).required(),
         title: joi.string().min(5).max(29).required(),
         documentType: joi.string().valid('TaskList', 'Note').default('Note'),
         status: joi.string().valid('private', 'public', 'readOnly', 'everyOneEdits').default('private')
@@ -51,16 +52,16 @@ router.post('/:user_id', async (req, res) => {
                 documentType: req.body.documentType,
                 blocks: [],
                 parent_id: null,
-                createdBy: req.params.user_id,
+                createdBy: req.body.user_id,
                 createdAt: new Date(),
-                lastEditedBy: req.params.user_id,
+                lastEditedBy: req.body.user_id,
                 lastEditedAt: new Date(),
-                owners: [req.params.user_id],
+                owners: [req.body.user_id],
                 status: req.body.status
             });
 
             await db.collection(process.env.COLLECTION_USERS)
-            .updateOne({_id: ObjectId(req.params.user_id)}, {$push: { documents: documentData.insertedId}});
+            .updateOne({_id: ObjectId(req.body.user_id)}, {$push: { documents: documentData.insertedId}});
     
             if(documentData){
                 res.status(200).send({message: 'document was created'});
