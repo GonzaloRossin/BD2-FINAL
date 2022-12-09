@@ -31,8 +31,46 @@ router.delete('/:document_id', (req, res) => {
     
 });
 
-router.post('/', (req, res) => {
+router.post('/:user_id', async (req, res) => {
+    const documentSchema = joi.object().keys({
+        title: joi.string().min(5).max(29).required(),
+        documentType: joi.string().valid('TaskList', 'Note').default('Note'),
+        status: joi.string().valid('private', 'public', 'readOnly', 'everyOneEdits').default('private')
+    });
+
+    const {error} = documentSchema.validate(req.body);
+    const valid = error == null;
+
+    if(!valid){
+        res.status(422).json({error: error.message});
+    }else{
+
+        try{
+            const documentData = await db.collection(process.env.COLLECTION_DOCUMENTS).insertOne({
+                title: req.body.title,
+                documentType: req.body.documentType,
+                blocks: [],
+                parent_id: null,
+                createdBy: req.params.user_id,
+                createdAt: new Date(),
+                lastEditedBy: req.params.user_id,
+                lastEditedAt: new Date(),
+                owners: [req.params.user_id],
+                status: req.body.status
+            });
+
+            await db.collection(process.env.COLLECTION_USERS)
+            .updateOne({_id: ObjectId(req.params.user_id)}, {$push: { documents: documentData.insertedId}});
     
+            if(documentData){
+                res.status(200).send({message: 'document was created'});
+            }
+    
+        }catch(error){
+            res.status(500).json({message: 'Error creating document', error});
+        }
+    }
+
     
 });
 

@@ -13,6 +13,7 @@ app.use('/documents',  documentRoutes);
 app.use('/favorites', favoritesRoutes);
 
 (async () => {
+    
     await db.init();
 
     app.listen(process.env.PORT, () => console.log(`it's alive on http://localhost:${process.env.PORT}`));
