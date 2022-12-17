@@ -29,7 +29,19 @@ router.put('/:document_id', (req, res) => {
 
 router.delete('/:document_id', (req, res) => {
 
-    //normal
+    try {
+        db.collection(process.env.COLLECTION_DOCUMENTS).deleteOne({_id: ObjectId(req.params.document_id)});
+        db.collection(process.env.COLLECTION_USERS).updateMany({favorites: req.params.document_id, documents: ObjectId(req.params.document_id)},{
+            $pull: {
+                favorites: req.params.document_id,
+                documents: ObjectId(req.params.document_id)
+            }
+        }
+        );
+        res.status(200).send();
+    }catch(error){
+        res.status(500).json({message: 'Error deleting user', error}); 
+    }
 });
 
 router.post('/', async (req, res) => {
