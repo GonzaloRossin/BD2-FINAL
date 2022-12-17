@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const joi = require('joi');
 const { ObjectId } = require('mongodb');
+const crypto = require('crypto');
 const router = express.Router();
 const db = require('../db/db.util').getDb();
 
@@ -79,7 +80,8 @@ router.post('/:document_id/blocks', async (req, res) => {
     const blockSchema = joi.object().keys({
         contentType: joi.string().valid('header1', 'header2', 'text', 'page', 'link', 'image').required(),
         content: joi.string().min(1).max(500).required(),
-        status: joi.string().valid('done', 'toDo', 'none').required()
+        status: joi.string().valid('done', 'toDo', 'none').required(),
+        index: joi.number().integer().min(0).strict().required()
     });
 
     const {error} = blockSchema.validate(req.body);
@@ -94,10 +96,16 @@ router.post('/:document_id/blocks', async (req, res) => {
                 {
                     $push:{blocks:
                         {
-                            contentType: req.body.contentType,
-                            content: req.body.content,
-                            status: req.body.status
+                            $each: [{
+                                _id : crypto.randomBytes(20).toString('hex'),
+                                contentType: req.body.contentType,
+                                content: req.body.content,
+                                status: req.body.status,
+                                index: req.body.index
+                            }],
+                            $sort: {index: 1}
                         }
+                        
                     },
                     $set: {lastEditedAt: new Date()}
                 }
