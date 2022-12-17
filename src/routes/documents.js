@@ -22,13 +22,13 @@ router.get('/:document_id', (req, res) => {
 });
 
 router.put('/:document_id', (req, res) => {
-    
+    //no deberia modificar los bloques
     
 });
 
 router.delete('/:document_id', (req, res) => {
 
-    
+    //normal
 });
 
 router.post('/', async (req, res) => {
@@ -116,7 +116,7 @@ router.post('/:document_id/blocks', async (req, res) => {
 });
 
 router.put('/:document_id/blocks/:block_id', (req, res) => {
-    
+    // ver como hacer para agregar un indice(posiciones)
     
 });
 

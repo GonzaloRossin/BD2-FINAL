@@ -99,6 +99,7 @@ router.put('/:user_id', (req,res) => {
 router.delete('/:user_id', (req, res) => {
 
     try {
+        //hace falta borrar los documentos primero
         db.collection(process.env.COLLECTION_USERS).deleteOne({_id: ObjectId(req.params.user_id)}).then(() => {
             res.status(200).send({message: 'user deleted succesfully'});
         });
