@@ -96,14 +96,24 @@ router.put('/:user_id', (req,res) => {
     }
 });
 
-router.delete('/:user_id', (req, res) => {
+router.delete('/:user_id', async (req, res) => {
 
     try {
-        //hace falta borrar los documentos primero
+        var docs;
+        await db.collection(process.env.COLLECTION_USERS).findOne(ObjectId(req.params.user_id)).then((result,err) => {
+            if(!err){
+               docs = result.documents;
+            }
+        });
+        db.collection(process.env.COLLECTION_DOCUMENTS).deleteMany({_id: {$in: docs}});
+        db.collection(process.env.COLLECTION_USERS).updateMany({favorites: {$in: docs}},{
+            $pull: {
+                favorites: {$in: docs}
+            }
+        });
         db.collection(process.env.COLLECTION_USERS).deleteOne({_id: ObjectId(req.params.user_id)}).then(() => {
             res.status(200).send({message: 'user deleted succesfully'});
         });
-
 
     }catch(error){
         res.status(500).json({message: 'Error deleting user', error}); 
