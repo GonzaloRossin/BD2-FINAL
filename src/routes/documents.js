@@ -3,6 +3,7 @@ const express = require('express');
 const joi = require('joi');
 const { ObjectId } = require('mongodb');
 const crypto = require('crypto');
+const { constants } = require('buffer');
 const router = express.Router();
 const db = require('../db/db.util').getDb();
 
@@ -24,7 +25,29 @@ router.get('/:document_id', (req, res) => {
 
 router.put('/:document_id', (req, res) => {
     //no deberia modificar los bloques
-    
+    const documentSchema = joi.object().keys({
+        user_id: joi.string().alphanum().length(24).required(),
+        title: joi.string().min(5).max(29),
+        documentType: joi.string().valid('TaskList', 'Note').default('Note'),
+        status: joi.string().valid('private', 'public', 'readOnly', 'everyOneEdits').default('private')
+    });
+    const {error} = documentSchema.validate(req.body);
+    const valid = error == null;
+
+    if (!valid) {
+        res.status(422).json({error: error.message});    
+    } else {
+        const updateQuery = {$set: req.body};
+        try {
+            db.collection(process.env.COLLECTION_DOCUMENTS)
+                .updateOne({_id: ObjectId(req.params.document_id)}, updateQuery)
+                .then(() => {
+                    res.status(200).send({message: 'document updated succesfully'});
+                });
+        } catch (error) {
+            res.status(500).json({message: 'Error updating document', error}); 
+        }
+    }
 });
 
 router.delete('/:document_id', (req, res) => {
