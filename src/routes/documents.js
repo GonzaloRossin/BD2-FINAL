@@ -135,6 +135,23 @@ router.post('/:document_id/blocks', async (req, res) => {
     
 });
 
+router.get('/:user_id', async (req, res) => {
+    var docs;
+    await db.collection(process.env.COLLECTION_USERS).findOne(ObjectId(req.params.user_id)).then((result,err) => {
+        if(!err){
+            docs = result;
+        }else{
+            res.status(500).json({message: 'user_id does not exist'});
+        }
+    });
+
+    await db.collection(process.env.COLLECTION_DOCUMENTS).find({_id: {$in: docs.documents}}).toArray().then((result, err) => {
+        if(!err){
+            res.status(200).json(result);
+        }
+    })
+})
+
 router.put('/:document_id/blocks/:block_id', (req, res) => {
     // ver como hacer para agregar un indice(posiciones)
     
