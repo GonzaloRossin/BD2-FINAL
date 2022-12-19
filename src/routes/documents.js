@@ -31,7 +31,7 @@ router.delete('/:document_id', (req, res) => {
 
     try {
         db.collection(process.env.COLLECTION_DOCUMENTS).deleteOne({_id: ObjectId(req.params.document_id)});
-        db.collection(process.env.COLLECTION_USERS).updateMany({favorites: req.params.document_id, documents: ObjectId(req.params.document_id)},{
+        db.collection(process.env.COLLECTION_USERS).updateMany({$or: [{favorites: req.params.document_id}, {documents: ObjectId(req.params.document_id)}]},{
             $pull: {
                 favorites: req.params.document_id,
                 documents: ObjectId(req.params.document_id)
