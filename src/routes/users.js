@@ -128,20 +128,23 @@ router.get('/', (req, res) => {
  *         description: user document of specified id
  *         schema:
  *           $ref: '#/definitions/User'
- *       400:
+ *       500:
  *         description: user_id was not found
  */
 router.get('/:user_id', (req, res) => {
     
-    db.collection(process.env.COLLECTION_USERS)
+    try{
+        db.collection(process.env.COLLECTION_USERS)
         .findOne({_id: ObjectId(req.params.user_id)})
         .then((doc, err) => {
             if(!err){
                 res.status(200).json(doc); 
-            }else{
-                res.status(400).json({message: 'user_id was not found'});
             }
+            
         });
+    }catch(error){
+        res.status(500).json({message: 'user_id was not found'});
+    }
 });
 
 /**
@@ -230,7 +233,7 @@ router.post('/', async (req, res) => {
  *       422:
  *         description: request body is invalid
  *       500:
- *         description: error in server side
+ *         description: user_id was not found
  */
 router.put('/:user_id', (req,res) => {
 
@@ -253,7 +256,7 @@ router.put('/:user_id', (req,res) => {
                     res.status(200).send({message: 'user updated succesfully'});
                 });
         }catch(error){
-            res.status(500).json({message: 'Error deleting user', error}); 
+            res.status(500).json({message: 'user_id was not found', error}); 
         }
     }
 });
@@ -277,10 +280,8 @@ router.put('/:user_id', (req,res) => {
  *         description: message of successful deletion 
  *         schema:
  *           $ref: '#/definitions/User'
- *       400:
- *         description: user_id is invalid
  *       500:
- *         description: error on server side
+ *         description: user_id is invalid
  */
 router.delete('/:user_id', async (req, res) => {
 
@@ -289,8 +290,6 @@ router.delete('/:user_id', async (req, res) => {
         await db.collection(process.env.COLLECTION_USERS).findOne(ObjectId(req.params.user_id)).then((result,err) => {
             if(!err){
                docs = result.documents;
-            }else{
-                res.status(400).json({message: 'invalid user_id'});
             }
         });
         db.collection(process.env.COLLECTION_DOCUMENTS).deleteMany({_id: {$in: docs}});
@@ -304,7 +303,7 @@ router.delete('/:user_id', async (req, res) => {
         });
 
     }catch(error){
-        res.status(500).json({message: 'Error deleting user', error}); 
+        res.status(500).json({message: 'user_id was not found', error}); 
     }
 });
 

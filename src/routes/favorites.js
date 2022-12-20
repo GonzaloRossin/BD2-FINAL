@@ -6,6 +6,166 @@ const db = require('../db/db.util').getDb();
 
 /**
  * @swagger
+ * definitions:
+ *   Block:
+ *    properties:
+ *     _id:
+ *       type: object
+ *       example: 639e8b766721f047ac096ffd
+ *     contentType:
+ *       type: string
+ *       enum:
+ *        - header1
+ *        - header2
+ *        - text
+ *        - page
+ *        - link
+ *        - image
+ *       example: text
+ *     content:
+ *       type: string
+ *       minLength: 1
+ *       maxLength: 500
+ *       example: Contenido
+ *     status:
+ *       enum:
+ *         - done
+ *         - toDo
+ *         - none
+ *     index:
+ *       type: integer
+ *       min: 0
+ *   Document:
+ *     properties:
+ *       _id:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       title:
+ *         type: string
+ *         minLength: 1
+ *         maxLength: 24
+ *         example: Titulo
+ *       documentType:
+ *         type: string
+ *         enum:
+ *          - TaskList
+ *          - Note
+ *         example: Note
+ *       blocks:
+ *         type: array
+ *         items: 
+ *           $ref: '#/definitions/Block'
+ *       parent_id:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       createdBy:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       createdAt:
+ *         type: string
+ *         format: date-time
+ *         example: 2022-12-20T12:52:27.587Z
+ *       lastEditedBy:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       lastEditedAt:
+ *         type: string
+ *         format: date-time
+ *         example: 2022-12-20T12:52:27.587Z
+ *       owners:
+ *         type: array
+ *         items: 
+ *           type: object
+ *       status:
+ *         type: string
+ *         enum:
+ *          - private
+ *          - public
+ *          - readOnly
+ *          - everyOneEdits
+ *         example: private
+ *   Post_Document:
+ *     properties:
+ *       user_id:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       title:
+ *         type: string
+ *         minLength: 1
+ *         maxLength: 24
+ *         example: Titulo
+ *       documentType:
+ *         type: string
+ *         enum:
+ *          - TaskList
+ *          - Note
+ *         example: Note
+ *       status:
+ *         type: string
+ *         enum:
+ *          - private
+ *          - public
+ *          - readOnly
+ *          - everyOneEdits
+ *         example: private
+ *     required:
+ *       - user_id
+ *       - title
+ *   Edit_document:
+ *     properties:
+ *       title:
+ *         type: string
+ *         minLength: 1
+ *         maxLength: 24
+ *         example: Titulo
+ *       documentType:
+ *         type: string
+ *         enum:
+ *          - TaskList
+ *          - Note
+ *         example: Note
+ *       status:
+ *         enum:
+ *          - private
+ *          - public
+ *          - readOnly
+ *          - everyOneEdits
+ *         example: private
+ *   Post_block:
+ *     properties:
+ *       contentType:
+ *         type: string
+ *         enum:
+ *          - header1
+ *          - header2
+ *          - text
+ *          - page
+ *          - link
+ *          - image
+ *         example: text
+ *       content:
+ *         type: string
+ *         minLength: 1
+ *         maxLength: 500
+ *         example: Contenido
+ *       status:
+ *         enum:
+ *           - done
+ *           - toDo
+ *           - none
+ *       index:
+ *         type: integer
+ *         min: 0
+ *     required:
+ *       - contentType
+ *       - content
+ *       - status
+ *       - index
+ */
+
+
+/**
+ * @swagger
  * /favorites/{user_id}:
  *   get:
  *     tags:
@@ -13,7 +173,7 @@ const db = require('../db/db.util').getDb();
  *     summary: gets the documents set as favorites
  *     parameters:
  *      - in: path
- *        name: userId
+ *        name: user_id
  *        required: true
  *   produces:
  *     - application/json
@@ -55,10 +215,10 @@ router.get('/:user_id', async (req, res) => {
  *     summary: Add a document to favorites
  *     parameters:
  *      - in: path
- *        name: userId
+ *        name: user_id
  *        required: true
  *      - in: path
- *        name: documentId
+ *        name: document_id
  *        required: true
  *   produces:
  *    - application/json
@@ -93,32 +253,31 @@ router.post('/:user_id/:document_id', async (req, res) => {
  *     summary: Deletes a document from favorites
  *     parameters:
  *      - in: path
- *        name: userId
+ *        name: user_id
  *        required: true
  *        example: 639e8c426721f047ac096ffe
  *      - in: path
- *        name: documentId
+ *        name: document_id
  *        required: true
  *        example: 639e8c426721f047ac096ffe
  *   produces:
  *     - application/json
  *   responses:
  *     200:
- *       description: returns the document that was removed
- *       schema:
- *         $ref: '#/definitions/Document'
- *     400:
- *       description: 1 or more of the ids are invalid
+ *       description: returns a message that the document was removed
+ *     500:
+ *       description: user_id is invalid
  */
 router.delete('/:user_id/:document_id', async (req, res) => {
-    
-    const data = await db.collection(process.env.COLLECTION_USERS)
+    try{
+        const data = await db.collection(process.env.COLLECTION_USERS)
                         .updateOne({_id: ObjectId(req.params.user_id)}, {$pull: { favorites: req.params.document_id}});
     
     if(data){
-        res.status(200).send({message: 'document removed from favorites'});
-    }else{
-        res.status(400).send({message: '1 or more ids are invalid'});
+        res.status(200).json({message: 'document removed from favorites'});
+    }
+    }catch(error){
+        res.status(500).json({message: 'user_id is invalid'});
     }
 });
 
