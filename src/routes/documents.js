@@ -8,6 +8,184 @@ const router = express.Router();
 const db = require('../db/db.util').getDb();
 
 
+/**
+ * @swagger
+ * definitions:
+ *   Block:
+ *    properties:
+ *     _id:
+ *       type: object
+ *       example: 639e8b766721f047ac096ffd
+ *     contentType:
+ *       type: string
+ *       enum:
+ *        - header1
+ *        - header2
+ *        - text
+ *        - page
+ *        - link
+ *        - image
+ *       example: text
+ *     content:
+ *       type: string
+ *       minLength: 1
+ *       maxLength: 500
+ *       example: Contenido
+ *     status:
+ *       enum:
+ *         - done
+ *         - toDo
+ *         - none
+ *     index:
+ *       type: integer
+ *       min: 0
+ *   Document:
+ *     properties:
+ *       _id:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       title:
+ *         type: string
+ *         minLength: 1
+ *         maxLength: 24
+ *         example: Titulo
+ *       documentType:
+ *         type: string
+ *         enum:
+ *          - TaskList
+ *          - Note
+ *         example: Note
+ *       blocks:
+ *         type: array
+ *         items: 
+ *           $ref: '#/definitions/Block'
+ *       parent_id:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       createdBy:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       createdAt:
+ *         type: string
+ *         format: date-time
+ *         example: 2022-12-20T12:52:27.587Z
+ *       lastEditedBy:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       lastEditedAt:
+ *         type: string
+ *         format: date-time
+ *         example: 2022-12-20T12:52:27.587Z
+ *       owners:
+ *         type: array
+ *         items: 
+ *           type: object
+ *       status:
+ *         type: string
+ *         enum:
+ *          - private
+ *          - public
+ *          - readOnly
+ *          - everyOneEdits
+ *         example: private
+ *   Post_Document:
+ *     properties:
+ *       user_id:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       title:
+ *         type: string
+ *         minLength: 1
+ *         maxLength: 24
+ *         example: Titulo
+ *       documentType:
+ *         type: string
+ *         enum:
+ *          - TaskList
+ *          - Note
+ *         example: Note
+ *       status:
+ *         type: string
+ *         enum:
+ *          - private
+ *          - public
+ *          - readOnly
+ *          - everyOneEdits
+ *         example: private
+ *     required:
+ *       - user_id
+ *       - title
+ *   Edit_document:
+ *     properties:
+ *       title:
+ *         type: string
+ *         minLength: 1
+ *         maxLength: 24
+ *         example: Titulo
+ *       documentType:
+ *         type: string
+ *         enum:
+ *          - TaskList
+ *          - Note
+ *         example: Note
+ *       status:
+ *         enum:
+ *          - private
+ *          - public
+ *          - readOnly
+ *          - everyOneEdits
+ *         example: private
+ *   Post_block:
+ *     properties:
+ *       contentType:
+ *         type: string
+ *         enum:
+ *          - header1
+ *          - header2
+ *          - text
+ *          - page
+ *          - link
+ *          - image
+ *         example: text
+ *       content:
+ *         type: string
+ *         minLength: 1
+ *         maxLength: 500
+ *         example: Contenido
+ *       status:
+ *         enum:
+ *           - done
+ *           - toDo
+ *           - none
+ *       index:
+ *         type: integer
+ *         min: 0
+ *     required:
+ *       - contentType
+ *       - content
+ *       - status
+ *       - index
+ */
+
+/**
+ * @swagger
+ * /documents/{document_id}:
+ *   get:
+ *     summary: Get a document by ID
+ *     parameters:
+ *       - in: path
+ *         name: document_id
+ *         required: true
+ *     tags:
+ *       - Documents
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: document of specified id
+ *         schema:
+ *           $ref: '#/definitions/Document'
+ */
 router.get('/:document_id', (req, res) => {
     
     try {
@@ -26,18 +204,26 @@ router.get('/:document_id', (req, res) => {
 
 /**
  * @swagger
- * /api/puppies:
+ * /documents/{document_id}:
  *   put:
+ *     summary: Edit a document by ID
+ *     parameters:
+ *       - in: path
+ *         name: document_id
+ *         required: true
+ *       - in: body
+ *         name: document
+ *         schema:
+ *          $ref: '#/definitions/Edit_document'
  *     tags:
- *       - Puppies
- *     description: Returns all puppies
+ *       - Documents
  *     produces:
  *       - application/json
  *     responses:
  *       200:
- *         description: An array of puppies
+ *         description: document of specified id with edited fields
  *         schema:
- *           $ref: '#/definitions/Puppy'
+ *           $ref: '#/definitions/Document'
  */
 router.put('/:document_id', (req, res) => {
     //no deberia modificar los bloques
@@ -65,6 +251,26 @@ router.put('/:document_id', (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /documents/{document_id}:
+ *   delete:
+ *     summary: Delete a document by ID
+ *     parameters:
+ *       - in: path
+ *         name: document_id
+ *         required: true
+ *     tags:
+ *       - Documents
+ *     description: Deletes document of specified id
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: message of successful deletion 
+ *         schema:
+ *           $ref: '#/definitions/Document'
+ */
 router.delete('/:document_id', (req, res) => {
 
     try {
@@ -82,6 +288,28 @@ router.delete('/:document_id', (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /documents:
+ *   post:
+ *     summary: Creates a new document
+ *     consumes:
+ *      - application/json
+ *     parameters:
+ *      - in: body
+ *        name: user
+ *        schema:
+ *         $ref: '#/definitions/Post_document' 
+ *     tags:
+ *       - Documents
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: document of specified id
+ *         schema:
+ *           $ref: '#/definitions/Document'
+ */
 router.post('/', async (req, res) => {
     const documentSchema = joi.object().keys({
         user_id: joi.string().alphanum().length(24).required(),
@@ -126,6 +354,32 @@ router.post('/', async (req, res) => {
     
 });
 
+/**
+ * @swagger
+ * /documents/{document_id}/blocks:
+ *   post:
+ *     summary: Creates a new block to a document by ID
+ *     consumes:
+ *      - application/json
+ *     parameters:
+ *      - in: path
+ *        name: document_id
+ *        required: true
+ * 
+ *      - in: body
+ *        name: user
+ *        schema:
+ *         $ref: '#/definitions/Post_block' 
+ *     tags:
+ *       - Documents
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: document of specified id
+ *         schema:
+ *           $ref: '#/definitions/Document'
+ */
 router.post('/:document_id/blocks', async (req, res) => {
     const blockSchema = joi.object().keys({
         contentType: joi.string().valid('header1', 'header2', 'text', 'page', 'link', 'image').required(),
@@ -161,7 +415,6 @@ router.post('/:document_id/blocks', async (req, res) => {
                 }
             );
 
-    
             if(documentData){
                 res.status(200).send({message: 'block was added to document'});
             }
@@ -173,6 +426,32 @@ router.post('/:document_id/blocks', async (req, res) => {
     
 });
 
+/**
+ * @swagger
+ * /documents/{document_id}/blocks/{block_id}:
+ *   put:
+ *     summary: Edit a block by document ID and block ID
+ *     parameters:
+ *       - in: path
+ *         name: document_id
+ *         required: true
+ *       - in: path
+ *         name: block_id
+ *         required: true
+ *       - in: body
+ *         name: document
+ *         schema:
+ *          $ref: '#/definitions/Post_block'
+ *     tags:
+ *       - Documents
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: document of specified id with edited fields
+ *         schema:
+ *           $ref: '#/definitions/Document'
+ */
 router.put('/:document_id/blocks/:block_id', async (req, res) => {
     // ver como hacer para agregar un indice(posiciones)
     const blockSchema = joi.object().keys({
@@ -209,6 +488,29 @@ router.put('/:document_id/blocks/:block_id', async (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /documents/{document_id}/blocks/{block_id}:
+ *   delete:
+ *     summary: Delete a block by ID
+ *     parameters:
+ *       - in: path
+ *         name: document_id
+ *         required: true
+ *       - in: path
+ *         name: block_id
+ *         required: true
+ *     tags:
+ *       - Documents
+ *     description: Deletes block of specified document id and block id
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: message of successful deletion 
+ *         schema:
+ *           $ref: '#/definitions/Document'
+ */
 router.delete('/:document_id/blocks/:block_id', async (req, res) => {
     const data = await db.collection(process.env.COLLECTION_DOCUMENTS)
                         .updateOne({_id: ObjectId(req.params.document_id)}, {$pull: { blocks: req.params.block_id}});

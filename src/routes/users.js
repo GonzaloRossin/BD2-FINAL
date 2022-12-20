@@ -115,7 +115,7 @@ router.get('/', (req, res) => {
  *     summary: Get a user by ID
  *     parameters:
  *       - in: path
- *         name: userId
+ *         name: user_id
  *         required: true
  *     tags:
  *       - Users
@@ -206,7 +206,7 @@ router.post('/', async (req, res) => {
  *     summary: Edit a user by ID
  *     parameters:
  *       - in: path
- *         name: userId
+ *         name: user_id
  *         required: true
  *       - in: body
  *         name: user
@@ -255,7 +255,7 @@ router.put('/:user_id', (req,res) => {
  *     summary: Delete a user by ID
  *     parameters:
  *       - in: path
- *         name: userId
+ *         name: user_id
  *         required: true
  *     tags:
  *       - Users
