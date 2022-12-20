@@ -92,8 +92,8 @@ const bcrypt = require('bcrypt');
  *         users:
  *         type: array
  *         items:
- *          type: schema
- *          $ref: '#/definitions/User'
+ *           type: schema
+ *           $ref: '#/definitions/User'
  *       500:
  *         description: error on server side
  */
@@ -165,7 +165,7 @@ router.get('/:user_id', (req, res) => {
  *     produces:
  *      - application/json
  *     responses:
- *      200:
+ *      201:
  *        description: user document of specified id
  *        schema:
  *         $ref: '#/definitions/User'

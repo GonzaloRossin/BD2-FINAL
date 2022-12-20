@@ -175,15 +175,15 @@ const db = require('../db/db.util').getDb();
  *      - in: path
  *        name: user_id
  *        required: true
- *   produces:
- *     - application/json
- *   responses:
- *     200:
- *       description: return array of favorite documents
- *       schema:
- *         $ref: '#/definitions/Document'
- *     500:
- *       description: user_id was not found
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: return array of favorite documents
+ *         schema:
+ *           $ref: '#/definitions/Document'
+ *       500:
+ *         description: user_id was not found
  */
 router.get('/:user_id', async (req, res) => {
 
@@ -225,15 +225,15 @@ router.get('/:user_id', async (req, res) => {
  *      - in: path
  *        name: document_id
  *        required: true
- *   produces:
- *    - application/json
- *   responses:
- *     200:
- *       description: id of document added to favorites
- *       schema:
- *         $ref: '#/definitions/Document'
- *     400:
- *       description: 1 or more of the ids are invalid
+ *     produces:
+ *      - application/json
+ *     responses:
+ *       201:
+ *         description: id of document added to favorites
+ *         schema:
+ *           $ref: '#/definitions/Document'
+ *       400:
+ *         description: 1 or more of the ids are invalid
  */
 router.post('/:user_id/:document_id', async (req, res) => {
 
@@ -241,7 +241,13 @@ router.post('/:user_id/:document_id', async (req, res) => {
                         .updateOne({_id: ObjectId(req.params.user_id)}, {$push: { favorites: new ObjectId(req.params.document_id)}});
     
     if(data){
-        res.status(200).send({message: 'document added to favorites'});
+        db.collection(process.env.COLLECTION_USERS)
+            .findOne({_id: ObjectId(req.params.user_id)})
+            .then((doc, err) => {
+                  if(!err){
+                      res.status(200).json(doc); 
+                 }
+            });
     }else{
         res.status(400).send({message: '1 or more ids are invalid'});
     }
@@ -265,13 +271,13 @@ router.post('/:user_id/:document_id', async (req, res) => {
  *        name: document_id
  *        required: true
  *        example: 639e8c426721f047ac096ffe
- *   produces:
- *     - application/json
- *   responses:
- *     200:
- *       description: returns a message that the document was removed
- *     500:
- *       description: user_id is invalid
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: returns a message that the document was removed
+ *       500:
+ *         description: user_id is invalid
  */
 router.delete('/:user_id/:document_id', async (req, res) => {
     try{
