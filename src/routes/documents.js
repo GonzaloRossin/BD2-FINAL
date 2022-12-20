@@ -8,6 +8,123 @@ const router = express.Router();
 const db = require('../db/db.util').getDb();
 
 
+/**
+ * @swagger
+ * definitions:
+ *   Block:
+ *    properties:
+ *     _id:
+ *       type: object
+ *       example: 639e8b766721f047ac096ffd
+ *     contentType:
+ *       type: string
+ *       enum:
+ *        - header1
+ *        - header2
+ *        - text
+ *        - page
+ *        - link
+ *        - image
+ *       example: text
+ *     content:
+ *       type: string
+ *       minLength: 1
+ *       maxLength: 500
+ *       example: Contenido
+ *     status:
+ *       enum:
+ *         - done
+ *         - toDo
+ *         - none
+ *     index:
+ *       type: integer
+ *       min: 0
+ *   Document:
+ *     properties:
+ *       _id:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       title:
+ *         type: string
+ *         minLength: 1
+ *         maxLength: 24
+ *         example: Titulo
+ *       documentType:
+ *         type: string
+ *         enum:
+ *          - TaskList
+ *          - Note
+ *         example: Note
+ *       blocks:
+ *         type: array
+ *         items: 
+ *           $ref: '#/definitions/Block'
+ *       parent_id:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       createdBy:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       createdAt:
+ *         type: string
+ *         format: date-time
+ *         example: 639e8b766721f047ac096ffd
+ *       lastEditedBy:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       lastEditedAt:
+ *         type: string
+ *         format: date-time
+ *         example: 639e8b766721f047ac096ffd
+ *       owners:
+ *         type: array
+ *         items: 
+ *           type: object
+ *       status:
+ *         type: string
+ *         enum:
+ *          - private
+ *          - public
+ *          - readOnly
+ *          - everyOneEdits
+ *         example: private
+ *   Post_user:
+ *     properties:
+ *       username:
+ *         type: string
+ *         minLength: 4
+ *         maxLength: 25
+ *         example: johnDoe123
+ *       password:
+ *         type: string
+ *         minLength: 3
+ *         maxLength: 30
+ *         pattern: '^[a-zA-Z0-9]{3,30}$'
+ *         example: password123
+ *       email:
+ *         type: string
+ *         example: johnDoe@gmail.com
+ *     required:
+ *      - username
+ *      - password
+ *      - email
+ *   Edit_user:
+ *     properties:
+ *       username:
+ *         type: string
+ *         minLength: 4
+ *         maxLength: 25
+ *         example: johnDoe123
+ *       password:
+ *         type: string
+ *         minLength: 3
+ *         maxLength: 30
+ *         pattern: '^[a-zA-Z0-9]{3,30}$'
+ *         example: password123
+ *       email:
+ *         type: string
+ *         example: johnDoe@gmail.com
+ */
 router.get('/:document_id', (req, res) => {
     
     try {
