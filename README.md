@@ -9,12 +9,13 @@ Correr `npm install` en el root del proyecto
 
 En el puerto default de mongodb (27017), levantar una base de datos con nombre BD2Final. Para ello ejecutar los siguientes comandos en una terminal.
 
-`docker pull mongo`
-`docker run --name Mymongo –p 27017:27017 -d mongo`
-
+```
+$ docker pull mongo
+$ docker run --name Mymongo –p 27017:27017 -d mongo
+```
 Luego usar `docker stop Mymongo` para apagar el contenedor y `docker start Mymongo` para iniciarlo nuevamente.
 
-### Ultimo paso
+### Último paso
 Ultimo paso antes de iniciar chequear que el archivo .env tenga seteadas correctamente las variables de entorno. Deberia verse asi.
 
 ```
