@@ -17,11 +17,13 @@ Luego usar `docker stop Mymongo` para apagar el contenedor y `docker start Mymon
 ### Ultimo paso
 Ultimo paso antes de iniciar chequear que el archivo .env tenga seteadas correctamente las variables de entorno. Deberia verse asi.
 
-`DB_NAME = BD2Final
+```
+DB_NAME = BD2Final
 DB_URL = mongodb://localhost:27017/BD2Final
 PORT = 7070
 COLLECTION_USERS = users
-COLLECTION_DOCUMENTS = documents`
+COLLECTION_DOCUMENTS = documents
+```
 
 ### Iniciar el servidor
 Asegurarse primero que el contenedor de docker para mongodb este corriendo y finalmente, ingresar a la carpeta src del proyecto con `cd src` y luego correr el servidor con `node .`.
