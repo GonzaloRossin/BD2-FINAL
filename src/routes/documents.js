@@ -513,7 +513,8 @@ router.put('/:document_id/blocks/:block_id', async (req, res) => {
  */
 router.delete('/:document_id/blocks/:block_id', async (req, res) => {
     const data = await db.collection(process.env.COLLECTION_DOCUMENTS)
-                        .updateOne({_id: ObjectId(req.params.document_id)}, {$pull: { blocks: req.params.block_id}});
+                        .updateOne({_id: ObjectId(req.params.document_id)}, {$pull:
+                             { blocks: {_id: req.params.block_id}}});
     
     if(data){
         res.status(200).send({message: 'block removed from document'});
