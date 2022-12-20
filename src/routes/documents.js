@@ -32,6 +32,7 @@ const db = require('../db/db.util').getDb();
  *       maxLength: 500
  *       example: Contenido
  *     status:
+ *       type: string
  *       enum:
  *         - done
  *         - toDo
