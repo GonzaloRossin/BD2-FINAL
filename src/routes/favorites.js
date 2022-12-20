@@ -22,6 +22,8 @@ const db = require('../db/db.util').getDb();
  *       description: return array of favorite documents
  *       schema:
  *         $ref: '#/definitions/Document'
+ *     400:
+ *       description: user_id was not found
  */
 router.get('/:user_id', async (req, res) => {
 
@@ -31,6 +33,9 @@ router.get('/:user_id', async (req, res) => {
     .then((result, err) => {
         if(!err){
             favorite_array = result.favorites;
+        }
+        else{
+            res.status(400).json({message: 'user_id was not found'});
         }
     });   
     
@@ -55,15 +60,15 @@ router.get('/:user_id', async (req, res) => {
  *      - in: path
  *        name: documentId
  *        required: true
- *   tags:
- *     - Favorites
  *   produces:
- *     - application/json
+ *    - application/json
  *   responses:
  *     200:
- *       description: document added to favorites
+ *       description: id of document added to favorites
  *       schema:
  *         $ref: '#/definitions/Document'
+ *     400:
+ *       description: 1 or more of the ids are invalid
  */
 router.post('/:user_id/:document_id', async (req, res) => {
 
@@ -73,7 +78,7 @@ router.post('/:user_id/:document_id', async (req, res) => {
     if(data){
         res.status(200).send({message: 'document added to favorites'});
     }else{
-        res.status(500).send({message: 'error while adding document to favorites'});
+        res.status(400).send({message: '1 or more ids are invalid'});
     }
     
 });
@@ -102,6 +107,8 @@ router.post('/:user_id/:document_id', async (req, res) => {
  *       description: returns the document that was removed
  *       schema:
  *         $ref: '#/definitions/Document'
+ *     400:
+ *       description: 1 or more of the ids are invalid
  */
 router.delete('/:user_id/:document_id', async (req, res) => {
     
@@ -111,7 +118,7 @@ router.delete('/:user_id/:document_id', async (req, res) => {
     if(data){
         res.status(200).send({message: 'document removed from favorites'});
     }else{
-        res.status(500).send({message: 'error while removing document from favorites'});
+        res.status(400).send({message: '1 or more ids are invalid'});
     }
 });
 
