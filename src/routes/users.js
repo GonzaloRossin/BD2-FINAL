@@ -14,7 +14,7 @@ const bcrypt = require('bcrypt');
  *   User:
  *     properties:
  *       _id:
- *         type: object
+ *         type: string
  *         example: 639e8b766721f047ac096ffd
  *       username:
  *         type: string
