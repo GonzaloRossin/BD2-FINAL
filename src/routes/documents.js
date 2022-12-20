@@ -570,8 +570,13 @@ router.delete('/:document_id/blocks/:block_id', async (req, res) => {
                              { blocks: {_id: req.params.block_id}}});
     
     if(data){
-        res.status(200).send({message: 'block removed from document'});
-    }else{
+        db.collection(process.env.COLLECTION_DOCUMENTS)
+            .findOne({_id: ObjectId(req.params.document_id)})
+            .then((doc) => {
+                 doc.blocks = doc.blocks.sort((a,b) => a.index - b.index);
+                res.status(200).json(doc);
+            });
+    } else {
         res.status(500).send({message: 'error while removing block from document'});
     }
 });

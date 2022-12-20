@@ -92,8 +92,8 @@ const bcrypt = require('bcrypt');
  *         users:
  *         type: array
  *         items:
- *          type: schema
- *          $ref: '#/definitions/User'
+ *           type: schema
+ *           $ref: '#/definitions/User'
  *       500:
  *         description: error on server side
  */
