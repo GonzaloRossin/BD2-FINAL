@@ -162,17 +162,19 @@ router.get('/:user_id', (req, res) => {
  *        name: user
  *        schema:
  *         $ref: '#/definitions/Post_user' 
- *   produces:
- *     - application/json
- *   responses:
- *     200:
- *       description: user document of specified id
- *       schema:
+ *     produces:
+ *      - application/json
+ *     responses:
+ *      200:
+ *        description: user document of specified id
+ *        schema:
  *         $ref: '#/definitions/User'
- *     422:
- *       description: request body is invalid
- *     500:
- *       description: error on server side
+ *      409:
+ *        description: user already exists(email registered)
+ *      422:
+ *        description: request body is invalid
+ *      500:
+ *        description: error on server side
  */
 router.post('/', async (req, res) => {
 
@@ -188,29 +190,33 @@ router.post('/', async (req, res) => {
     if(!valid){
         res.status(422).json({error: error.message});
     }else{
-        
-        try{
-            const salt = bcrypt.genSaltSync(10);
-            const hash = bcrypt.hashSync(req.body.password, salt);
-            const data = await db.collection(process.env.COLLECTION_USERS).insertOne({
-                username: req.body.username,
-                password: hash,
-                email: req.body.email,
-                documents: [],
-                favorites: []
-            });
-    
-            if(data){
-                db.collection(process.env.COLLECTION_USERS)
-                .findOne({username: req.body.username})
-                .then((doc, err) => {
-                    if(!err){
-                        res.status(200).json(doc); 
-                    }
+        const user = await db.collection(process.env.COLLECTION_USERS).findOne({email: req.body.email});
+        if(user){
+            res.status(409).json({message: 'email already exists'});
+        }else{
+            try{
+                const salt = bcrypt.genSaltSync(10);
+                const hash = bcrypt.hashSync(req.body.password, salt);
+                const data = await db.collection(process.env.COLLECTION_USERS).insertOne({
+                    username: req.body.username,
+                    password: hash,
+                    email: req.body.email,
+                    documents: [],
+                    favorites: []
                 });
+        
+                if(data){
+                    db.collection(process.env.COLLECTION_USERS)
+                    .findOne({username: req.body.username})
+                    .then((doc, err) => {
+                        if(!err){
+                            res.status(200).json(doc); 
+                        }
+                    });
+                }
+            }catch(error){
+                res.status(500).json({message: 'Error creating user', error});
             }
-        }catch(error){
-            res.status(500).json({message: 'Error creating user', error});
         }
     }
 
