@@ -15,7 +15,7 @@ En el puerto default de mongodb (27017), levantar una base de datos con nombre B
 
 ```
 $ docker pull mongo
-$ docker run --name Mymongo –p 27017:27017 -d mongo
+$ docker run --name Mymongo -p 27017:27017 -d mongo
 ```
 Luego usar `docker stop Mymongo` para apagar el contenedor y `docker start Mymongo` para iniciarlo nuevamente.
 
