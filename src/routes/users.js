@@ -154,15 +154,15 @@ router.get('/:user_id', (req, res) => {
  *        name: user
  *        schema:
  *         $ref: '#/definitions/Post_user' 
- *   tags:
- *     - Users
- *   produces:
- *     - application/json
- *   responses:
- *     200:
- *       description: user document of specified id
- *       schema:
- *         $ref: '#/definitions/User'
+ *     tags:
+ *       - Users
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: user document of specified id
+ *         schema:
+ *           $ref: '#/definitions/User'
  */
 router.post('/', async (req, res) => {
 
