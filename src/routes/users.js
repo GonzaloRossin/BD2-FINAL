@@ -6,9 +6,79 @@ const { ObjectId } = require('mongodb');
 const router = express.Router();
 const db = require('../db/db.util').getDb();
 
+
 /**
  * @swagger
- * /users/:
+ * definitions:
+ *   User:
+ *     properties:
+ *       _id:
+ *         type: object
+ *         example: 639e8b766721f047ac096ffd
+ *       username:
+ *         type: string
+ *         minLength: 4
+ *         maxLength: 25
+ *         example: johnDoe123
+ *       password:
+ *         type: string
+ *         minLength: 3
+ *         maxLength: 30
+ *         pattern: '^[a-zA-Z0-9]{3,30}$'
+ *       email:
+ *         type: string
+ *         example: example@gmail.com
+ *       documents:
+ *         type: array
+ *         items:
+ *           type: object
+ *           example: 639e8c426721f047ac096ffe
+ *       favorites:
+ *         type: array
+ *         items:
+ *           type: object
+ *           example: 639e8c426721f047ac096ffe
+ *   Post_user:
+ *     properties:
+ *       username:
+ *         type: string
+ *         minLength: 4
+ *         maxLength: 25
+ *         example: johnDoe123
+ *       password:
+ *         type: string
+ *         minLength: 3
+ *         maxLength: 30
+ *         pattern: '^[a-zA-Z0-9]{3,30}$'
+ *         example: password123
+ *       email:
+ *         type: string
+ *         example: johnDoe@gmail.com
+ *     required:
+ *      - username
+ *      - password
+ *      - email
+ *   Edit_user:
+ *     properties:
+ *       username:
+ *         type: string
+ *         minLength: 4
+ *         maxLength: 25
+ *         example: johnDoe123
+ *       password:
+ *         type: string
+ *         minLength: 3
+ *         maxLength: 30
+ *         pattern: '^[a-zA-Z0-9]{3,30}$'
+ *         example: password123
+ *       email:
+ *         type: string
+ *         example: johnDoe@gmail.com
+ */
+
+/**
+ * @swagger
+ * /users:
  *   get:
  *     tags:
  *       - Users
@@ -18,8 +88,11 @@ const db = require('../db/db.util').getDb();
  *     responses:
  *       200:
  *         description: An array of users
- *         schema:
- *           $ref: '#/definitions/Users'
+ *         users:
+ *         type: array
+ *         items:
+ *          type: schema
+ *          $ref: '#/definitions/User'
  */
 router.get('/', (req, res) => {
 
@@ -35,6 +108,25 @@ router.get('/', (req, res) => {
 
 });
 
+/**
+ * @swagger
+ * /users/{user_id}:
+ *   get:
+ *     summary: Get a user by ID
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *     tags:
+ *       - Users
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: user document of specified id
+ *         schema:
+ *           $ref: '#/definitions/User'
+ */
 router.get('/:user_id', (req, res) => {
     
     try {
@@ -50,10 +142,32 @@ router.get('/:user_id', (req, res) => {
     }
 });
 
+/**
+ * @swagger
+ * /users:
+ *   post:
+ *     summary: Creates a new user
+ *     consumes:
+ *      - application/json
+ *     parameters:
+ *      - in: body
+ *        name: user
+ *        schema:
+ *         $ref: '#/definitions/Post_user' 
+ *   tags:
+ *     - Users
+ *   produces:
+ *     - application/json
+ *   responses:
+ *     200:
+ *       description: user document of specified id
+ *       schema:
+ *         $ref: '#/definitions/User'
+ */
 router.post('/', async (req, res) => {
 
     const userSchema = joi.object().keys({
-        username: joi.string().alphanum().min(4).max(12).required(),
+        username: joi.string().alphanum().min(4).max(25).required(),
         password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).min(3).max(20).required(),
         email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } }).required()
     });
@@ -85,10 +199,33 @@ router.post('/', async (req, res) => {
 
 })
 
+/**
+ * @swagger
+ * /users/{user_id}:
+ *   put:
+ *     summary: Edit a user by ID
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *       - in: body
+ *         name: user
+ *         schema:
+ *          $ref: '#/definitions/Edit_user'
+ *     tags:
+ *       - Users
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: user document of specified id with edited fields
+ *         schema:
+ *           $ref: '#/definitions/User'
+ */
 router.put('/:user_id', (req,res) => {
 
     const userEditSchema = joi.object().keys({
-        username: joi.string().alphanum().min(4).max(12),
+        username: joi.string().alphanum().min(4).max(25),
         password: joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).min(3).max(20),
         email: joi.string().email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
     });
@@ -111,6 +248,26 @@ router.put('/:user_id', (req,res) => {
     }
 });
 
+/**
+ * @swagger
+ * /users/{user_id}:
+ *   delete:
+ *     summary: Delete a user by ID
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *     tags:
+ *       - Users
+ *     description: Deletes user of specified id along with its documents
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: message of successful deletion 
+ *         schema:
+ *           $ref: '#/definitions/User'
+ */
 router.delete('/:user_id', async (req, res) => {
 
     try {
