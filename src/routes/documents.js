@@ -338,7 +338,7 @@ router.delete('/:document_id', (req, res) => {
  *     produces:
  *       - application/json
  *     responses:
- *       200:
+ *       201:
  *         description: document of specified id
  *         schema:
  *           $ref: '#/definitions/Document'
@@ -419,8 +419,8 @@ router.post('/', async (req, res) => {
  *     responses:
  *       400:
  *         description: bad request given
- *       200:
- *         description: document of specified id
+ *       201:
+ *         description: document of specified id with new block added
  *         schema:
  *           $ref: '#/definitions/Document'
  */

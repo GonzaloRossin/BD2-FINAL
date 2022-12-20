@@ -165,7 +165,7 @@ router.get('/:user_id', (req, res) => {
  *     produces:
  *      - application/json
  *     responses:
- *      200:
+ *      201:
  *        description: user document of specified id
  *        schema:
  *         $ref: '#/definitions/User'
