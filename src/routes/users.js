@@ -207,7 +207,7 @@ router.post('/', async (req, res) => {
         
                 if(data){
                     db.collection(process.env.COLLECTION_USERS)
-                    .findOne({username: req.body.username})
+                    .findOne({email: req.body.email})
                     .then((doc, err) => {
                         if(!err){
                             res.status(200).json(doc); 
