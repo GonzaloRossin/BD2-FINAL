@@ -204,6 +204,36 @@ router.get('/:document_id', (req, res) => {
 
 /**
  * @swagger
+ * /documents:
+ *   get:
+ *     summary: Get all documents
+ *     tags:
+ *       - Documents
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: array of all documents
+ *         schema:
+ *           $ref: '#/definitions/Document'
+ */
+ router.get('/', (req, res) => {
+    
+    try {
+        db.collection(process.env.COLLECTION_DOCUMENTS)
+        .find({}).toArray().then((doc) => {
+            res.status(200).json(doc);
+        });
+
+
+    }catch(error){
+        res.status(500).json({message: 'Error getting document', error}); 
+    }
+});
+
+
+/**
+ * @swagger
  * /documents/{document_id}:
  *   put:
  *     summary: Edit a document by ID
@@ -285,7 +315,7 @@ router.delete('/:document_id', (req, res) => {
             }
         }
         );
-        res.status(200).send();
+        res.status(200).json({message: 'document deleted succesfully'});
     }catch(error){
         res.status(500).json({message: 'Error deleting user', error}); 
     }
