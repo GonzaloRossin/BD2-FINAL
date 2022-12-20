@@ -265,7 +265,7 @@ router.put('/:document_id', async (req, res) => {
     const {error} = documentSchema.validate(req.body);
     const valid = error == null;
 
-    if (!valid) {
+    if (!valid){
         res.status(422).json({error: error.message});    
     } else {
         const updateQuery = {$set: req.body};
