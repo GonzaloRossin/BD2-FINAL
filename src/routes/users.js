@@ -5,6 +5,7 @@ const joi = require('joi');
 const { ObjectId } = require('mongodb');
 const router = express.Router();
 const db = require('../db/db.util').getDb();
+const bcrypt = require('bcrypt');
 
 
 /**
@@ -189,9 +190,11 @@ router.post('/', async (req, res) => {
     }else{
         
         try{
+            const salt = bcrypt.genSaltSync(10);
+            const hash = bcrypt.hashSync(req.body.password, salt);
             const data = await db.collection(process.env.COLLECTION_USERS).insertOne({
                 username: req.body.username,
-                password: req.body.password,
+                password: hash,
                 email: req.body.email,
                 documents: [],
                 favorites: []
