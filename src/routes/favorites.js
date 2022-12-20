@@ -4,6 +4,25 @@ const { ObjectId } = require('mongodb');
 const router = express.Router();
 const db = require('../db/db.util').getDb();
 
+/**
+ * @swagger
+ * /favorites/{user_id}:
+ *   get:
+ *     tags:
+ *     - Favorites
+ *     summary: gets the documents set as favorites
+ *     parameters:
+ *      - in: path
+ *        name: userId
+ *        required: true
+ *   produces:
+ *     - application/json
+ *   responses:
+ *     200:
+ *       description: return array of favorite documents
+ *       schema:
+ *         $ref: '#/definitions/Document'
+ */
 router.get('/:user_id', async (req, res) => {
 
     var favorite_array;
@@ -24,18 +43,27 @@ router.get('/:user_id', async (req, res) => {
 
 /**
  * @swagger
- * /api/puppies:
+ * /favorites/{user_id}/{document_id}:
  *   post:
  *     tags:
- *       - Puppies
- *     description: Returns all puppies
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: An array of puppies
- *         schema:
- *           $ref: '#/definitions/Puppy'
+ *     - Favorites
+ *     summary: Add a document to favorites
+ *     parameters:
+ *      - in: path
+ *        name: userId
+ *        required: true
+ *      - in: path
+ *        name: documentId
+ *        required: true
+ *   tags:
+ *     - Favorites
+ *   produces:
+ *     - application/json
+ *   responses:
+ *     200:
+ *       description: document added to favorites
+ *       schema:
+ *         $ref: '#/definitions/Document'
  */
 router.post('/:user_id/:document_id', async (req, res) => {
 
@@ -53,18 +81,27 @@ router.post('/:user_id/:document_id', async (req, res) => {
 
 /**
  * @swagger
- * /api/puppies:
+ * /favorites/{user_id}/{document_id}:
  *   delete:
  *     tags:
- *       - Puppies
- *     description: Returns all puppies
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: An array of puppies
- *         schema:
- *           $ref: '#/definitions/Puppy'
+ *     - Favorites
+ *     summary: Deletes a document from favorites
+ *     parameters:
+ *      - in: path
+ *        name: userId
+ *        required: true
+ *        example: 639e8c426721f047ac096ffe
+ *      - in: path
+ *        name: documentId
+ *        required: true
+ *        example: 639e8c426721f047ac096ffe
+ *   produces:
+ *     - application/json
+ *   responses:
+ *     200:
+ *       description: returns the document that was removed
+ *       schema:
+ *         $ref: '#/definitions/Document'
  */
 router.delete('/:user_id/:document_id', async (req, res) => {
     

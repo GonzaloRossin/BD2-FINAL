@@ -82,7 +82,7 @@ const db = require('../db/db.util').getDb();
  *   get:
  *     tags:
  *       - Users
- *     description: Returns all users
+ *     summary: Returns all users
  *     produces:
  *       - application/json
  *     responses:
@@ -146,6 +146,8 @@ router.get('/:user_id', (req, res) => {
  * @swagger
  * /users:
  *   post:
+ *     tags:
+ *     - Users
  *     summary: Creates a new user
  *     consumes:
  *      - application/json
@@ -154,8 +156,6 @@ router.get('/:user_id', (req, res) => {
  *        name: user
  *        schema:
  *         $ref: '#/definitions/Post_user' 
- *   tags:
- *     - Users
  *   produces:
  *     - application/json
  *   responses:
