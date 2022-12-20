@@ -282,8 +282,7 @@ router.post('/:user_id/:document_id', async (req, res) => {
 router.delete('/:user_id/:document_id', async (req, res) => {
     try{
         const data = await db.collection(process.env.COLLECTION_USERS)
-                        .updateOne({_id: ObjectId(req.params.user_id)}, {$pull: { favorites: req.params.document_id}});
-    
+                        .updateOne({_id: ObjectId(req.params.user_id)}, {$pull: { favorites: ObjectId(req.params.document_id)}});
     if(data){
         res.status(200).json({message: 'document removed from favorites'});
     }
