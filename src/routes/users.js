@@ -201,9 +201,14 @@ router.post('/', async (req, res) => {
             });
     
             if(data){
-                res.status(200).send({message: 'user was created'});
+                db.collection(process.env.COLLECTION_USERS)
+                .findOne({username: req.body.username})
+                .then((doc, err) => {
+                    if(!err){
+                        res.status(200).json(doc); 
+                    }
+                });
             }
-    
         }catch(error){
             res.status(500).json({message: 'Error creating user', error});
         }
@@ -238,7 +243,7 @@ router.post('/', async (req, res) => {
  *       500:
  *         description: user_id was not found
  */
-router.put('/:user_id', (req,res) => {
+router.put('/:user_id', async (req,res) => {
 
     const userEditSchema = joi.object().keys({
         username: joi.string().alphanum().min(4).max(25),
@@ -253,11 +258,18 @@ router.put('/:user_id', (req,res) => {
     }else{
         const updateQuery = {$set: req.body};
         try {
-            db.collection(process.env.COLLECTION_USERS)
-                .updateOne({_id: ObjectId(req.params.user_id)}, updateQuery)
-                .then(() => {
-                    res.status(200).send({message: 'user updated succesfully'});
+            const data = await db.collection(process.env.COLLECTION_USERS)
+                .updateOne({_id: ObjectId(req.params.user_id)}, updateQuery);
+
+            if(data) {
+                db.collection(process.env.COLLECTION_USERS)
+                .findOne({_id: ObjectId(req.params.user_id)})
+                .then((doc, err) => {
+                    if(!err){
+                        res.status(200).json(doc); 
+                    }
                 });
+            }
         }catch(error){
             res.status(500).json({message: 'user_id was not found', error}); 
         }

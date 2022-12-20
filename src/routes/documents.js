@@ -225,7 +225,7 @@ router.get('/:document_id', (req, res) => {
  *         schema:
  *           $ref: '#/definitions/Document'
  */
-router.put('/:document_id', (req, res) => {
+router.put('/:document_id', async (req, res) => {
     //no deberia modificar los bloques
     const documentSchema = joi.object().keys({
         title: joi.string().min(5).max(29),
@@ -240,10 +240,13 @@ router.put('/:document_id', (req, res) => {
     } else {
         const updateQuery = {$set: req.body};
         try {
-            db.collection(process.env.COLLECTION_DOCUMENTS)
+            await db.collection(process.env.COLLECTION_DOCUMENTS)
                 .updateOne({_id: ObjectId(req.params.document_id)}, updateQuery)
-                .then(() => {
-                    res.status(200).send({message: 'document updated succesfully'});
+            
+            db.collection(process.env.COLLECTION_DOCUMENTS)
+                .findOne({_id: ObjectId(req.params.document_id)})
+                .then((doc) => {
+                    res.status(200).json(doc);
                 });
         } catch (error) {
             res.status(500).json({message: 'Error updating document', error}); 
@@ -297,9 +300,9 @@ router.delete('/:document_id', (req, res) => {
  *      - application/json
  *     parameters:
  *      - in: body
- *        name: user
+ *        name: document
  *        schema:
- *         $ref: '#/definitions/Post_document' 
+ *         $ref: '#/definitions/Post_Document' 
  *     tags:
  *       - Documents
  *     produces:
@@ -324,7 +327,6 @@ router.post('/', async (req, res) => {
     if(!valid){
         res.status(422).json({error: error.message});
     }else{
-
         try{
             const documentData = await db.collection(process.env.COLLECTION_DOCUMENTS).insertOne({
                 title: req.body.title,
@@ -343,9 +345,13 @@ router.post('/', async (req, res) => {
             .updateOne({_id: ObjectId(req.body.user_id)}, {$push: { documents: documentData.insertedId}});
     
             if(documentData){
-                res.status(200).send({message: 'document was created'});
+                db.collection(process.env.COLLECTION_DOCUMENTS)
+                    .findOne({_id: ObjectId(documentData.insertedId)})
+                    .then((doc) => {
+                        res.status(200).json(doc);
+                    });
             }
-    
+
         }catch(error){
             res.status(500).json({message: 'Error creating document', error});
         }
@@ -367,7 +373,7 @@ router.post('/', async (req, res) => {
  *        required: true
  * 
  *      - in: body
- *        name: user
+ *        name: PostBlock
  *        schema:
  *         $ref: '#/definitions/Post_block' 
  *     tags:
@@ -416,7 +422,11 @@ router.post('/:document_id/blocks', async (req, res) => {
             );
 
             if(documentData){
-                res.status(200).send({message: 'block was added to document'});
+                db.collection(process.env.COLLECTION_DOCUMENTS)
+                    .findOne({_id: ObjectId(req.params.document_id)})
+                    .then((doc) => {
+                        res.status(200).json(doc);
+                    });
             }
     
         }catch(error){
@@ -474,13 +484,18 @@ router.put('/:document_id/blocks/:block_id', async (req, res) => {
                     "blocks.$[updateBlock].contentType" : req.body.contentType,
                     "blocks.$[updateBlock].status" : req.body.status,
                     "blocks.$[updateBlock].index" : req.body.index
-                }}, {
+                } }, {
                     arrayFilters: [
                       {"updateBlock._id" : req.params.block_id}
                     ]
                 })
                 .then(() => {
-                    res.status(200).send({message: 'document updated succesfully'});
+                    db.collection(process.env.COLLECTION_DOCUMENTS)
+                        .findOne({_id: ObjectId(req.params.document_id)})
+                        .then((doc) => {
+                            doc.blocks = doc.blocks.sort((a,b) => a.index - b.index);
+                            res.status(200).json(doc);
+                        });
                 });
         } catch(error) {
             res.status(500).json({message: 'Error updating block', error}); 
