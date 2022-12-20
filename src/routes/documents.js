@@ -312,6 +312,12 @@ router.delete('/:document_id', (req, res) => {
  *         description: document of specified id
  *         schema:
  *           $ref: '#/definitions/Document'
+ *       400:
+ *         description: bad request given
+ *       500:
+ *         description: request body is invalid (invalid user_id)
+ *       502:
+ *         description: server is down
  */
 router.post('/', async (req, res) => {
     const documentSchema = joi.object().keys({
@@ -381,6 +387,8 @@ router.post('/', async (req, res) => {
  *     produces:
  *       - application/json
  *     responses:
+ *       400:
+ *         description: bad request given
  *       200:
  *         description: document of specified id
  *         schema:
