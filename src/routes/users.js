@@ -1,11 +1,26 @@
 require('dotenv').config();
 const express = require('express');
+const { string } = require('joi');
 const joi = require('joi');
 const { ObjectId } = require('mongodb');
 const router = express.Router();
 const db = require('../db/db.util').getDb();
 
-
+/**
+ * @swagger
+ * /users/:
+ *   get:
+ *     tags:
+ *       - Users
+ *     description: Returns all users
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: An array of users
+ *         schema:
+ *           $ref: '#/definitions/Users'
+ */
 router.get('/', (req, res) => {
 
     try {

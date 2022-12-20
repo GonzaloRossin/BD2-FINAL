@@ -23,6 +23,22 @@ router.get('/:document_id', (req, res) => {
     }
 });
 
+
+/**
+ * @swagger
+ * /api/puppies:
+ *   put:
+ *     tags:
+ *       - Puppies
+ *     description: Returns all puppies
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: An array of puppies
+ *         schema:
+ *           $ref: '#/definitions/Puppy'
+ */
 router.put('/:document_id', (req, res) => {
     //no deberia modificar los bloques
     const documentSchema = joi.object().keys({

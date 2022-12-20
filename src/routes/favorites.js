@@ -22,6 +22,21 @@ router.get('/:user_id', async (req, res) => {
     });
 });
 
+/**
+ * @swagger
+ * /api/puppies:
+ *   post:
+ *     tags:
+ *       - Puppies
+ *     description: Returns all puppies
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: An array of puppies
+ *         schema:
+ *           $ref: '#/definitions/Puppy'
+ */
 router.post('/:user_id/:document_id', async (req, res) => {
 
     const data = await db.collection(process.env.COLLECTION_USERS)
@@ -35,6 +50,22 @@ router.post('/:user_id/:document_id', async (req, res) => {
     
 });
 
+
+/**
+ * @swagger
+ * /api/puppies:
+ *   delete:
+ *     tags:
+ *       - Puppies
+ *     description: Returns all puppies
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: An array of puppies
+ *         schema:
+ *           $ref: '#/definitions/Puppy'
+ */
 router.delete('/:user_id/:document_id', async (req, res) => {
     
     const data = await db.collection(process.env.COLLECTION_USERS)
