@@ -24,4 +24,4 @@ COLLECTION_USERS = users
 COLLECTION_DOCUMENTS = documents`
 
 ### Iniciar el servidor
-Finalmente ingresar a la carpeta src del proyecto con `cd src` y luego correr el servidor con `node .`.
+Asegurarse primero que el contenedor de docker para mongodb este corriendo y finalmente, ingresar a la carpeta src del proyecto con `cd src` y luego correr el servidor con `node .`.
