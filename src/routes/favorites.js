@@ -182,12 +182,13 @@ const db = require('../db/db.util').getDb();
  *       description: return array of favorite documents
  *       schema:
  *         $ref: '#/definitions/Document'
- *     400:
+ *     500:
  *       description: user_id was not found
  */
 router.get('/:user_id', async (req, res) => {
 
-    var favorite_array;
+    try{
+        var favorite_array;
     await db.collection(process.env.COLLECTION_USERS)
     .findOne({_id: ObjectId(req.params.user_id)})
     .then((result, err) => {
@@ -204,6 +205,10 @@ router.get('/:user_id', async (req, res) => {
             res.status(200).json(docs);
         }
     });
+
+    }catch(error){
+        res.status(500).json({message: 'user_id was not found'});
+    }
 });
 
 /**
